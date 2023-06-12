@@ -14,11 +14,11 @@ const commodity_loser_cat2 = [' Slumps ', ' Plunges ', ' Descends ', ' Tumbles '
 const currency_winner = [' apperciates ']
 const currency_loser = [' depreciates ']
 
-function getTitle (category, append, prepend, index_val, random) {
+function getTitle (category, append, prepend, name, change, random) {
     if (random == true) {
-        var title = append + index_val.name + getRandomItem(category) + 'by ' + prepend + index_val.change + '%';
+        var title = append + name + getRandomItem(category) + 'by ' + prepend + change + '%';
     } else {
-        var title = append + index_val.name + ' ' + prepend + index_val.change + '%';
+        var title = append + name + ' ' + prepend + change + '%';
     }    
     return title
 }
@@ -90,14 +90,27 @@ function handleTopGainNLoss (ordered_stuff) {
 }
 
 
+function insert_title_by_category(row_value, name, change) {
+    console.log('row_value ' + row_value)
+    console.log('change ' + change)
+    append = ''
+    prepend = ''
+    if (change > 0) {
+        te_title = getTitle(currency_winner, append, prepend, name, change, true)
+    } else {
+        te_title = getTitle(currency_loser, append, prepend, name, change, true)
+    }
+    row_value += ' ' + te_title
+    console.log('final row_value ' + row_value)
+}
+
 function read_csv() {
     const fs = require('fs');
     const csv = require('csv-parser');
-    const arrayOfObjects = [];
 
     fs.createReadStream('test_currency.csv')
-  .pipe(csv())
-  .on('data', (row) => {
+    .pipe(csv())
+    .on('data', (row) => {
     // console.log(row);
     row_value = row['fx'];
     const columns = row_value.trim().split('\t');
@@ -105,19 +118,14 @@ function read_csv() {
         const name = columns[0];
         let change = columns[3];
         change = parseFloat(change.replace('%', ''));
-        console.log(typeof(change))
-        const obj = {
-            "name": name,
-            "change": change
-        }
-        arrayOfObjects.push(obj);
+        console.log(change);
+        insert_title_by_category(row_value, name, change);
       }
+   
+   
   })
   .on('end', () => {
     console.log('CSV file successfully processed');
-    console.log(arrayOfObjects);
-    console.log(arrayOfObjects.length)
-    handleTopGainNLoss(arrayOfObjects);
   });
 }
 
@@ -130,7 +138,7 @@ te_title = 'Commodities Updates:'
 ordered_stuff = [{"name":"France Electricity","change":0.1005,"abs_change":5.1005},{"name":"TTF Gas","change":5.01,"abs_change":5.01}] */
 
 var request_to_group_upper = 'CURRENCIES'
-te_title = 'FX Updates:'
+// te_title = 'FX Updates:'
 // ordered_stuff = [{"name":"Zimbabwean RTGS Dollar","change":+87.9511,"abs_change":87.9511},{"name":"USDAOA","change":+3.38,"abs_change":3.38}]
 
 read_csv()
