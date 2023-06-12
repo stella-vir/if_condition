@@ -11,8 +11,8 @@ const commodity_winner_cat2 = [' Rallies ', ' Surges ',  ' Soars ', ' Spikes '];
 const commodity_loser_cat1 = [' Falls ', ' Dips ', ' Drops ', ' Sinks '];
 const commodity_loser_cat2 = [' Slumps ', ' Plunges ', ' Descends ', ' Tumbles '];
 
-const currency_winner = [' apperciates ']
-const currency_loser = [' depreciates ']
+const currency_winner = [' Apperciates ']
+const currency_loser = [' Depreciates ']
 
 function getTitle (category, append, prepend, name, change, random) {
     if (random == true) {
@@ -89,39 +89,51 @@ function handleTopGainNLoss (ordered_stuff) {
     console.log(te_title)
 }
 
+function plain_english(name) {
+    switch (name) {
+        case 'EURUSD':
+            name = 'Euro';
+            break;
+        case 'GBPUSD':
+            name = 'British Pound';
+            break;
+        case 'AUDUSD':
+            name = 'Australian Dollar';
+    }
+    return name
+}
 
-function insert_title_by_category(row_value, name, change) {
-    console.log('row_value ' + row_value)
-    console.log('change ' + change)
+function insert_title_by_category(row_value, symbol, change) {
     append = ''
     prepend = ''
+    const name = plain_english(symbol)
     if (change > 0) {
+        prepend = '+'
         te_title = getTitle(currency_winner, append, prepend, name, change, true)
     } else {
         te_title = getTitle(currency_loser, append, prepend, name, change, true)
     }
     row_value += ' ' + te_title
-    console.log('final row_value ' + row_value)
+    console.log(row_value)
+    console.log(typeof(row_value))
 }
 
-function read_csv() {
+function read_csv(file) {
     const fs = require('fs');
     const csv = require('csv-parser');
 
-    fs.createReadStream('test_currency.csv')
+    fs.createReadStream(file)
     .pipe(csv())
     .on('data', (row) => {
     // console.log(row);
-    row_value = row['fx'];
+    row_value = row['fx/commodity'];
     const columns = row_value.trim().split('\t');
     if (columns.length >= 3) {
-        const name = columns[0];
+        const symbol = columns[0];
         let change = columns[3];
         change = parseFloat(change.replace('%', ''));
-        console.log(change);
-        insert_title_by_category(row_value, name, change);
+        insert_title_by_category(row_value, symbol, change);
       }
-   
    
   })
   .on('end', () => {
@@ -141,5 +153,10 @@ var request_to_group_upper = 'CURRENCIES'
 // te_title = 'FX Updates:'
 // ordered_stuff = [{"name":"Zimbabwean RTGS Dollar","change":+87.9511,"abs_change":87.9511},{"name":"USDAOA","change":+3.38,"abs_change":3.38}]
 
-read_csv()
+if (request_to_group_upper == 'CURRENCIES') {
+    read_csv('test_currency.csv')
+} else if (request_to_group_upper == 'COMMODITIES') {
+    read_csv('test_commodity.csv')
+}
+
 
