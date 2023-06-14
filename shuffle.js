@@ -4,9 +4,11 @@ const commodity_winner_cat1 = [' Rises ', ' Increases ',  ' Incurs Gains ', ' Gr
 const commodity_winner_cat2 = [' Rallies ', ' Surges ',  ' Soars ', ' Spikes '];
 const commodity_loser_cat1 = [' Falls ', ' Dips ', ' Drops ', ' Sinks '];
 const commodity_loser_cat2 = [' Slumps ', ' Plunges ', ' Descends ', ' Tumbles '];
+const commodity_loser_cat3 = [' Crashes ', ' Collapses ', ' Crumbles ', ' Craters '];
 
-const currency_winner_cat1 = [' Appreciates ']
-const currency_winner_cat2 = [' Holds ']
+
+const currency_winner_cat1 = [' Appreciates ', ]
+const currency_winner_cat2 = [' Appreciates largely ']
 const currency_loser_cat1 = [' Depreciates ']
 const currency_loser_cat2 = [' Weekens ']
 
@@ -251,11 +253,11 @@ function read_csv(file, isCommodityFile) {
 
 let ordered_stuff
 
-// var a_request_to_group_upper = 'COMMODITIES'
+var a_request_to_group_upper = 'COMMODITIES'
 /* te_title = 'Commodities Updates:'
 ordered_stuff = [{"name":"France Electricity","change":0.1005,"abs_change":5.1005},{"name":"TTF Gas","change":5.01,"abs_change":5.01}] */
 
-var a_request_to_group_upper = 'CURRENCIES'
+// var a_request_to_group_upper = 'CURRENCIES'
 // te_title = 'FX Updates:'
 // ordered_stuff = [{"name":"Zimbabwean RTGS Dollar","change":+87.9511,"abs_change":87.9511},{"name":"USDAOA","change":+3.38,"abs_change":3.38}]
 
