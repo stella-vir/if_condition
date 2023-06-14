@@ -5,8 +5,10 @@ const commodity_winner_cat2 = [' Rallies ', ' Surges ',  ' Soars ', ' Spikes '];
 const commodity_loser_cat1 = [' Falls ', ' Dips ', ' Drops ', ' Sinks '];
 const commodity_loser_cat2 = [' Slumps ', ' Plunges ', ' Descends ', ' Tumbles '];
 
-const currency_winner_cat1 = [' Apperciates ']
+const currency_winner_cat1 = [' Appreciates ']
+const currency_winner_cat2 = [' Holds ']
 const currency_loser_cat1 = [' Depreciates ']
+const currency_loser_cat2 = [' Weekens ']
 
 
 function getRandomItem(array) {
@@ -142,14 +144,23 @@ function plain_english(name) {
 }
 
 function insert_title_by_category_currency(row_value, symbol, change) {
+    console.log('insert_title_by_category_currency')
     append = ''
     prepend = ''
     const name = plain_english(symbol)
     if (change > 0) {
         prepend = '+'
-        te_title = getTitle(currency_winner_cat1, append, prepend, name, change, true)
+        if (change >= 1) {
+            te_title = getTitle(currency_winner_cat2, append, prepend, name, change, true)
+        } else {
+            te_title = getTitle(currency_winner_cat1, append, prepend, name, change, true)
+        }    
     } else {
-        te_title = getTitle(currency_loser_cat1, append, prepend, name, change, true)
+        if (change <= -1) {
+            te_title = getTitle(currency_loser_cat2, append, prepend, name, change, true)
+        } else {
+            te_title = getTitle(currency_loser_cat1, append, prepend, name, change, true)
+        }
     }
     row_value += ' ' + te_title
     // console.log(row_value)
@@ -157,12 +168,13 @@ function insert_title_by_category_currency(row_value, symbol, change) {
 }
 
 function insert_title_by_category_commodity(row_value, symbol, change) {
+    console.log('insert_title_by_category_commodity')
     append = ''
     prepend = ''
     const name = plain_english(symbol)
     if (change > 0) {
         prepend = '+'
-        if (change >= 5) {
+        if (change >= 4) {
             te_title = getTitle(commodity_winner_cat2, append, prepend, name, change, true)
         } else {
             te_title = getTitle(commodity_winner_cat1, append, prepend, name, change, true)
@@ -180,6 +192,7 @@ function insert_title_by_category_commodity(row_value, symbol, change) {
 }
 
 function read_csv(file, isCommodityFile) {
+    console.log(isCommodityFile)
     const fs = require('fs');
     const csv = require('csv-parser');
     var allTitles = ''
@@ -199,15 +212,28 @@ function read_csv(file, isCommodityFile) {
         switch(isCommodityFile) {
             case true:
                 var titles = insert_title_by_category_commodity(row_value, symbol, change);
+                break;
             case false:
                 var titles = insert_title_by_category_currency(row_value, symbol, change);
+                break;
+            default:
+                console.log('Error occured @ inserting titles');
         }
         allTitles += titles
         allTitles += '\n'
         try {
             const csvLine = allTitles.split('% ').join('\t');
             console.log('csvLine ' + csvLine);
-            fs.writeFileSync('output.csv', csvLine);
+            switch(isCommodityFile) {
+                case true:
+                    fs.writeFileSync('commodity_output.csv', csvLine);
+                    break;
+                case false:
+                    fs.writeFileSync('currency_output.csv', csvLine);
+                    break;
+                default:
+                    console.log('Error occured @ writing into the files');
+            }
         } catch (error) {
             console.error('Error occured @ writing into the files', error.message);
         }
@@ -236,10 +262,10 @@ var a_request_to_group_upper = 'CURRENCIES'
 
 switch (a_request_to_group_upper) {
     case 'COMMODITIES':
-        read_csv('test_commodity.csv', false);
+        read_csv('test_commodity.csv', true);
         break;
     case 'CURRENCIES':
-        read_csv('test_currency.csv', true)
+        read_csv('test_currency.csv', false)
         break;
 }
 
